@@ -30,7 +30,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,ttf}'],
         runtimeCaching: [
           {
-            urlPattern: ({ request, url }) => request.destination === 'image' && url.origin !== self.location.origin,
+            urlPattern: ({ request, url }) => request.destination === 'image' && url.origin !== self.location.origin && !/^(tile\.openstreetmap\.org|server\.arcgisonline\.com)$/.test(url.hostname),
             handler: 'CacheFirst',
             options: {
               cacheName: 'nookly-property-images-v1',

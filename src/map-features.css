@@ -1,0 +1,63 @@
+/* NOOKLY MAP PHASE 6 - responsive mobile-inspired map surfaces */
+/* Six compact destinations; preserve one row across tablet and mobile. */
+.mobile-tabs{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+.native-shortcuts{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+.nookly-maps-page{padding-top:30px;padding-bottom:92px}
+.nookly-maps-heading{display:flex;justify-content:space-between;align-items:center;gap:22px;margin-bottom:23px}
+.nookly-maps-heading h1{font-size:clamp(25px,3.2vw,38px);letter-spacing:-1.2px;margin:8px 0 9px;color:var(--ink)}
+.nookly-maps-heading p{font-size:13px;color:var(--muted);max-width:640px;line-height:1.55;margin:0}
+.nookly-maps-filters{display:flex;gap:9px;flex-wrap:wrap;align-items:stretch;margin-bottom:17px}
+.nookly-maps-filters label{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:0 12px;color:var(--muted);min-height:44px}
+.nookly-maps-filters label:first-child{flex:1;min-width:210px}
+.nookly-maps-filters input,.nookly-maps-filters select{border:0;outline:0;background:transparent;color:var(--ink);min-width:0;font-size:12px;width:100%}
+.nookly-maps-filters label:nth-of-type(2){width:150px}
+.nookly-maps-filters select{border:1px solid var(--line);background:var(--surface);padding:0 10px;border-radius:12px;max-width:175px;font-size:12px}
+.nookly-map-geo-btn{display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);padding:0 13px;font-size:12px;font-weight:700;min-height:44px}
+.nookly-map-browse-grid{display:grid;grid-template-columns:minmax(295px,350px) minmax(0,1fr);border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--surface);min-height:585px}
+.nookly-maps-results{overflow-y:auto;max-height:650px;border-right:1px solid var(--line)}
+.nookly-map-count{display:flex;flex-direction:column;gap:3px;padding:16px 17px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:2}
+.nookly-map-count strong{font-size:14px;color:var(--ink)}.nookly-map-count span{font-size:11px;color:var(--muted)}
+.nookly-map-result{padding:12px 14px;border-bottom:1px solid var(--line);background:var(--surface)}
+.nookly-map-result.active{background:color-mix(in srgb,var(--blue) 6%,var(--surface));box-shadow:inset 3px 0 var(--blue)}
+.nookly-map-select{border:0;background:transparent;display:flex;align-items:start;gap:12px;padding:0;text-align:left;width:100%;color:var(--ink)}
+.nookly-map-select img,.nookly-map-photo-fallback{width:88px;height:83px;object-fit:cover;border-radius:10px;flex-shrink:0;background:#e0eaff;color:var(--blue);display:grid;place-items:center;font-size:32px}
+.nookly-map-result-copy{display:grid;gap:5px;min-width:0;flex:1}.nookly-map-result-copy strong{font-size:12px;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nookly-map-result-copy small{font-size:11px;color:var(--muted);line-height:1.5}.nookly-map-result-copy b{color:var(--blue);font-size:13px}.nookly-map-result-copy b small{font-weight:500}
+.nookly-map-result-links{display:flex;gap:16px;padding:10px 0 2px 99px}.nookly-map-result-links a{display:flex;align-items:center;gap:4px;color:var(--blue);font-size:11px;font-weight:700}
+.nookly-map-large{position:relative;min-height:585px;display:flex;flex-direction:column}
+.nookly-map-canvas{position:relative;width:100%;height:100%;min-height:305px;isolation:isolate}
+.nookly-map-leaflet{height:100%;width:100%;min-height:305px;z-index:0;background:#eaf0f8}
+.nookly-map-large>.nookly-map-canvas{flex:1;min-height:585px}
+.nookly-map-basemap{position:absolute;right:12px;top:12px;display:flex;gap:4px;background:var(--surface);border-radius:10px;padding:4px;z-index:450;box-shadow:0 3px 15px #0002}
+.nookly-map-basemap button{border:0;background:transparent;color:var(--muted);padding:8px 11px;font-size:11px;font-weight:700;border-radius:7px}
+.nookly-map-basemap button.active{background:var(--blue);color:white}
+.nookly-map-pin{background:var(--pin-color);width:35px;height:35px;display:grid;place-items:center;border:3px solid #fff;border-radius:50%;box-shadow:0 3px 9px #0004;color:#fff;font-size:19px;font-weight:800}
+.nookly-map-pin.selected{outline:3px solid #ffb020;z-index:100}
+.nookly-map-active-card{position:absolute;bottom:24px;left:14px;right:14px;z-index:400;display:flex;justify-content:space-between;align-items:center;gap:14px;padding:13px 15px;background:var(--surface);border:1px solid var(--line);border-radius:13px;box-shadow:0 8px 28px #0003}
+.nookly-map-active-card span{display:grid;gap:3px;min-width:0}.nookly-map-active-card strong{font-size:13px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.nookly-map-active-card small{font-size:11px;color:var(--muted);white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.nookly-map-active-card .btn{white-space:nowrap}
+.nookly-map-data-note{font-size:11px;line-height:1.6;color:var(--muted);margin:12px 0}
+.nookly-map-empty{display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:10px;padding:25px;color:var(--muted);font-size:13px;line-height:1.6}
+.nookly-map-empty-big{flex:1}.nookly-map-error{position:absolute;inset:55px 15px auto;z-index:500;padding:15px;background:var(--surface);border:1px solid var(--line);font-size:12px;color:var(--ink)}
+.nookly-map-notice{font-size:12px;line-height:1.6;color:var(--muted);background:var(--surface);border:1px solid var(--line);padding:12px;border-radius:9px;margin:12px 0}
+.nookly-map-notice button{border:0;background:transparent;color:var(--blue);display:inline-flex;align-items:center;gap:5px;font-weight:750}
+.nookly-property-location{margin-top:20px}
+.nookly-map-detail-heading{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:15px}
+.nookly-map-detail-heading h2{margin:4px 0 6px}.nookly-map-detail-heading p{margin:0;color:var(--muted);font-size:12px}
+.nookly-property-map{height:300px;border-radius:13px;overflow:hidden;background:#e8edf6;border:1px solid var(--line)}
+.nookly-map-detail-actions{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0 16px}
+.nookly-map-detail-actions a{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;padding:10px 14px;background:var(--surface);border:1px solid var(--line);color:var(--blue);font-size:12px;font-weight:700}
+.nookly-amenities-trigger{width:100%;display:flex;text-align:left;align-items:center;gap:12px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink)}
+.nookly-amenities-trigger>span:nth-child(2){display:grid;gap:4px;flex:1}.nookly-amenities-trigger strong{font-size:13px}.nookly-amenities-trigger small{font-size:11px;color:var(--muted);line-height:1.4}
+.nookly-amenities-content{padding:13px;border:1px solid var(--line);border-top:0;border-radius:0 0 12px 12px}
+.nookly-amenity-categories{display:flex;flex-wrap:wrap;gap:7px}.nookly-amenity-categories button{display:inline-flex;align-items:center;gap:5px;padding:8px 10px;border-radius:9px;border:1px solid var(--line);font-size:11px;color:var(--muted);background:var(--surface)}
+.nookly-amenity-categories button.active{border-color:var(--blue);color:var(--ink);background:color-mix(in srgb,var(--blue) 8%,var(--surface))}.nookly-amenity-categories b{color:var(--blue)}
+.nookly-amenities-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:280px;overflow:auto;padding-top:6px}
+.nookly-amenities-list button{display:flex;align-items:center;gap:9px;text-align:left;padding:10px;border-radius:10px;border:1px solid var(--line);color:var(--ink);background:var(--surface);min-width:0}
+.nookly-amenities-list button.active{border-color:var(--blue)}.nookly-amenities-list button>span:nth-child(2){display:grid;gap:2px;min-width:0;flex:1}
+.nookly-amenities-list strong{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nookly-amenities-list small{font-size:10px;color:var(--muted)}.nookly-amenities-list b{white-space:nowrap;font-size:10px;color:var(--blue)}
+.nookly-poi-badge{border-radius:9px;color:white;min-width:32px;height:32px;display:grid;place-items:center;font-size:13px}
+.nookly-poi-selected{display:flex;gap:11px;flex-wrap:wrap;align-items:center;margin-top:10px;padding:12px;background:var(--surface);border-radius:10px;font-size:12px}
+.nookly-poi-selected>span{color:var(--muted)}.nookly-poi-selected>a{display:inline-flex;gap:6px;align-items:center;color:var(--blue);font-weight:700;margin-left:auto}
+@media(max-width:820px){.nookly-map-browse-grid{grid-template-columns:1fr;display:flex;flex-direction:column}.nookly-map-large{order:0;min-height:390px}.nookly-map-large>.nookly-map-canvas{height:400px;min-height:390px}.nookly-maps-results{order:1;max-height:none;border-right:0;border-top:1px solid var(--line)}.nookly-maps-heading{align-items:start}.nookly-maps-heading .btn{padding:10px 12px;white-space:nowrap}.nookly-map-active-card{bottom:14px}}
+@media(max-width:560px){.nookly-maps-page{padding-top:22px}.nookly-maps-heading{flex-wrap:wrap}.nookly-maps-heading h1{font-size:25px}.nookly-maps-filters{display:grid;grid-template-columns:1fr 1fr}.nookly-maps-filters label:first-child{grid-column:span 2}.nookly-maps-filters select{max-width:none;min-height:43px}.nookly-maps-filters label:nth-of-type(2){width:100%}.nookly-map-geo-btn{min-width:0}.nookly-map-large>.nookly-map-canvas{min-height:340px;height:340px}.nookly-map-active-card{bottom:12px}.nookly-property-map{height:255px}.nookly-amenities-list{grid-template-columns:1fr}.nookly-map-detail-heading{flex-wrap:wrap}.mobile-tabs{grid-template-columns:repeat(6,1fr)!important}.mobile-tabs a{font-size:9px!important}}

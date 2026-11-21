@@ -4,6 +4,8 @@ import { ArrowLeft, ArrowRight, BedDouble, Bookmark, CalendarDays, Check, Chevro
 import { getPwaAccountId, loadSession, signOut } from './lib/auth';
 import { SignInPage, SignUpPage } from './components/AuthPages';
 import RoommateMatch from './components/RoommateMatch';
+import { MapBrowsePage, PropertyLocationPanel } from './components/NooklyMaps';
+import './map-features.css';
 import { errorMessage, missingCoreSettings, Query, databases, settings } from './lib/appwrite';
 import { changeFavorite, importGuestFavorites, synchronizeFavorites } from './lib/favorites';
 import { facilitiesOf, filterProperties, imageOf, loadProperties, loadProperty, priceOf } from './lib/housing';
@@ -55,6 +57,7 @@ function BottomNav({ state }: { state: AppState }) {
   return <nav className="mobile-tabs" aria-label="Primary navigation">
     <NavLink to="/" end><House size={21}/><span>Home</span></NavLink>
     <NavLink to="/explore"><Search size={21}/><span>Explore</span></NavLink>
+    <NavLink to="/map"><MapPin size={21}/><span>Map</span></NavLink>
     <NavLink to="/saved"><Heart size={21}/><span>Favorites</span></NavLink>
     {(!state.user || (state.user.userMode !== 'landlord' && state.user.userMode !== 'driver')) && <NavLink to="/match"><UsersRound size={21}/><span>Match</span></NavLink>}
     <NavLink to={state.user?.userMode === 'landlord' ? '/landlord' : '/account'}><UserRound size={21}/><span>{state.user?.userMode === 'landlord' ? 'Listings' : 'Profile'}</span></NavLink>
@@ -70,6 +73,7 @@ function Shell({ children, state }: { children: React.ReactNode; state: AppState
       <nav className={`navlinks ${menu ? 'mobile-open' : ''}`} aria-label="Main navigation">
         <NavLink end to="/" onClick={() => setMenu(false)}>Home</NavLink>
         <NavLink to="/explore" onClick={() => setMenu(false)}>Explore</NavLink>
+        <NavLink to="/map" onClick={() => setMenu(false)}>Map</NavLink>
         <NavLink to="/saved" onClick={() => setMenu(false)}>Favorites <span className="tiny-count">{state.favorites.length}</span></NavLink>
         {(!state.user || (state.user.userMode !== 'landlord' && state.user.userMode !== 'driver')) && <NavLink to="/match" onClick={() => setMenu(false)}>Roommate Match</NavLink>}
         {state.user?.userMode === 'landlord' && <NavLink to="/landlord" onClick={() => setMenu(false)}>My properties</NavLink>}
@@ -188,6 +192,7 @@ function Explore({ state, mode = 'explore' }: { state: AppState; mode?: 'home' |
         <div className="native-shortcuts" aria-label="Quick actions">
           <Link to="/saved"><span className="shortcut-icon red"><Heart size={27}/></span><span>Favorites</span></Link>
           <Link to="/explore"><span className="shortcut-icon blue"><Search size={27}/></span><span>Explore</span></Link>
+          <Link to="/map"><span className="shortcut-icon green"><MapPin size={27}/></span><span>Map</span></Link>
           {(!state.user || (state.user.userMode !== 'landlord' && state.user.userMode !== 'driver')) && <Link to="/match"><span className="shortcut-icon blue"><UsersRound size={27}/></span><span>Match</span></Link>}
           <Link to={state.user?.userMode==='landlord'?'/landlord':'/account'}><span className="shortcut-icon green">{state.user?.userMode==='landlord'?<House size={27}/>:<UserRound size={27}/>}</span><span>{state.user?.userMode==='landlord'?'Listings':'Profile'}</span></Link>
           <a href="#nookly-tips"><span className="shortcut-icon amber"><CalendarDays size={27}/></span><span>Pro Tips</span></a>
@@ -209,7 +214,7 @@ function Explore({ state, mode = 'explore' }: { state: AppState; mode?: 'home' |
         {filtersOpen && <div className="native-extra-filters"><label>Maximum rent (USD)<input type="number" min="0" value={max} onChange={e=>setMax(e.target.value)} placeholder="Any price"/></label><button onClick={()=>{setMax('');setLocation('');setSearch('');setCategory('All')}}>Clear filters</button></div>}
       </>}
       <div className="native-chips" role="group" aria-label="Property types">{RESIDENTIAL_TYPES.map(type => <button key={type} onClick={()=>setCategory(type)} className={category === type?'active':''}>{type === 'Boarding'?'Boarding House':type}</button>)}</div>
-      <div className="native-section-heading recommended-heading"><div><h2>{isHome ? 'Recommended' : 'All Student Properties'}</h2><p>{isHome ? 'Ranked housing from Nookly' : 'Search and filter Nookly accommodation'}</p></div><button className="native-refresh" disabled={!state.online || state.loading} onClick={()=>void state.refresh()} aria-label="Refresh properties"><RefreshCw size={18} className={state.loading?'spinning':''}/><span>Refresh</span></button></div>
+      <div className="native-section-heading recommended-heading"><div><h2>{isHome ? 'Recommended' : 'All Student Properties'}</h2><p>{isHome ? 'Ranked housing from Nookly' : 'Search and filter Nookly accommodation'}</p></div><Link to="/map" className="native-refresh"><MapPin size={17}/> View map</Link><button className="native-refresh" disabled={!state.online || state.loading} onClick={()=>void state.refresh()} aria-label="Refresh properties"><RefreshCw size={18} className={state.loading?'spinning':''}/><span>Refresh</span></button></div>
       {(state.fromCache || state.loadError) && <div className={`status-line ${state.loadError && !state.properties.length ? 'status-error' : ''}`} role="status">{state.fromCache && <><Bookmark size={16}/> Showing cached properties</>}</div>}
       <div className="mobile-result-count">{state.loading&&!state.properties.length?'Loading accommodation…':`${visible.length} propert${visible.length===1?'y':'ies'} found`}</div>
       {state.loading && !state.properties.length ? <div className="card-grid">{Array.from({length:6},(_,i)=><div className="card-skeleton" key={i}/>)}</div>
@@ -257,7 +262,7 @@ function Detail({ state }: { state: AppState }) {
     <div className="detail-head"><div><span className="section-kicker">{property.type || 'ACCOMMODATION'}</span><h1>{property.propertyName || 'Accommodation'}</h1><p><MapPin size={18}/>{property.address || 'Location unavailable'}</p></div><button className={`btn outline-btn ${saved?'saved-btn':''}`} onClick={()=>void state.toggleFavorite(property.$id)}><Heart size={18} fill={saved?'currentColor':'none'}/>{saved?'Saved':'Save this home'}</button></div>
     {cached && <div className="status-line"><WifiOff size={16}/> Viewing saved property details. Availability and prices may have changed.</div>}
     <div className="detail-gallery"><div className="gallery-primary">{photos[0] ? <img src={photos[0]} alt={property.propertyName || 'Property photo'}/> : <div className="photo-placeholder"><House size={54}/><span>Photo unavailable</span></div>}</div><div className="gallery-side">{photos.slice(1,3).map((src,i)=><img src={src} alt={`Property photo ${i+2}`} key={src}/>)}{photos.length<2 && <div className="photo-placeholder">More photos coming soon</div>}</div></div>
-    <div className="detail-layout"><section><div className="detail-block"><h2>About this place</h2><p className="long-copy">{property.description || 'No property description has been provided yet.'}</p></div><div className="detail-block"><h2>What this place offers</h2>{facilitiesOf(property).length ? <div className="amenity-grid">{facilitiesOf(property).map(f => <span key={f}><Check size={18}/>{f}</span>)}</div> : <p className="muted">Amenities have not been listed.</p>}</div></section>
+    <div className="detail-layout"><section><div className="detail-block"><h2>About this place</h2><p className="long-copy">{property.description || 'No property description has been provided yet.'}</p></div><div className="detail-block"><h2>What this place offers</h2>{facilitiesOf(property).length ? <div className="amenity-grid">{facilitiesOf(property).map(f => <span key={f}><Check size={18}/>{f}</span>)}</div> : <p className="muted">Amenities have not been listed.</p>}</div><PropertyLocationPanel property={property}/></section>
       <aside className="booking-box"><span className="section-kicker">MONTHLY RENT</span><div className="booking-price">${money(priceOf(property))}<small> / month</small></div><div className="booking-sep"/>{Number(property.bedrooms)>0 && <div className="spec-row"><BedDouble size={19}/><span>Bedrooms</span><strong>{property.bedrooms}</strong></div>}{Number(property.roomFor)>0 && <div className="spec-row"><UserRound size={19}/><span>Room for</span><strong>{property.roomFor}</strong></div>}{Number(property.availableSlots)>=0 && property.availableSlots!==undefined && <div className="spec-row"><Check size={19}/><span>Available slots</span><strong>{property.availableSlots}</strong></div>}
         <div className="booking-sep"/>
         {state.user ? <p className="booking-note">Accommodation requests, landlord messaging and reviews are being converted for the web. You are signed in, but those actions are not available yet.</p> : <>
@@ -326,7 +331,7 @@ function AppContent(){
   const state:AppState={user,userOffline,online,accountId,properties,loading,loadError,fromCache,cachedAt,favorites,pendingFavorites,guestFavorites,importGuestFavorites:importSavedGuestFavorites,refresh:()=>refresh(true),toggleFavorite,onLogin:setUser,onLogout};
   if(!sessionReady)return <div className="startup"><Brand/><div className="pulse"/><p>Preparing your Nookly home...</p></div>;
   return <Shell state={state}>{missingCoreSettings().length>0&&<div className="container config-warning"><strong>Appwrite setup needed:</strong> {missingCoreSettings().join(', ')}. Add these values to <code>.env</code> and restart the dev server.</div>}{sessionError&&<div className="container config-warning">Session check: {sessionError}</div>}
-    <Routes><Route path="/" element={<Explore state={state} mode="home"/>} /><Route path="/explore" element={<Explore state={state} mode="explore"/>} /><Route path="/saved" element={<Saved state={state}/>} /><Route path="/account" element={<Account state={state}/>} /><Route path="/properties/:id" element={<Detail state={state}/>} /><Route path="/sign-in" element={<SignInPage user={state.user} online={state.online} onLogin={state.onLogin}/>} /><Route path="/sign-up" element={<SignUpPage user={state.user} online={state.online} onLogin={state.onLogin}/>} /><Route path="/match" element={<RoommateMatch user={state.user} online={state.online}/>} /><Route path="/landlord" element={<Landlord state={state}/>} /><Route path="*" element={<div className="container page-inner"><Empty title="Page not found" desc="This page isn't available in Nookly Accommodation Web." action={<Link className="btn" to="/">Return home</Link>}/></div>}/></Routes>
+    <Routes><Route path="/" element={<Explore state={state} mode="home"/>} /><Route path="/explore" element={<Explore state={state} mode="explore"/>} /><Route path="/map" element={<MapBrowsePage properties={state.properties} loading={state.loading}/>} /><Route path="/saved" element={<Saved state={state}/>} /><Route path="/account" element={<Account state={state}/>} /><Route path="/properties/:id" element={<Detail state={state}/>} /><Route path="/sign-in" element={<SignInPage user={state.user} online={state.online} onLogin={state.onLogin}/>} /><Route path="/sign-up" element={<SignUpPage user={state.user} online={state.online} onLogin={state.onLogin}/>} /><Route path="/match" element={<RoommateMatch user={state.user} online={state.online}/>} /><Route path="/landlord" element={<Landlord state={state}/>} /><Route path="*" element={<div className="container page-inner"><Empty title="Page not found" desc="This page isn't available in Nookly Accommodation Web." action={<Link className="btn" to="/">Return home</Link>}/></div>}/></Routes>
   </Shell>;
 }
 

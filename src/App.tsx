@@ -4,6 +4,10 @@ import { ArrowLeft, ArrowRight, BedDouble, Bookmark, CalendarDays, Check, Chevro
 import { getPwaAccountId, loadSession, signOut } from './lib/auth';
 import { SignInPage, SignUpPage } from './components/AuthPages';
 import RoommateMatch from './components/RoommateMatch';
+import LandlordWorkspace from './components/LandlordWorkspace';
+import MyRequests from './components/MyRequests';
+import { PropertyEngagement, PropertyEnquiry } from './components/PropertyInteractions';
+import './property-workflows.css';
 import { MapBrowsePage, PropertyLocationPanel } from './components/NooklyMaps';
 import './map-features.css';
 import { errorMessage, missingCoreSettings, Query, databases, settings } from './lib/appwrite';
@@ -238,7 +242,7 @@ function SignInRequired({ title, desc, returnTo }: { title: string; desc: string
 function Account({ state }: { state: AppState }) {
   if (!state.user) return <SignInRequired title="Your Nookly profile" desc="You can explore and save accommodation as a guest. Sign in to access your personal profile." returnTo="/account" />;
   const user = state.user;
-  return <section className="container page-inner profile-page"><div className="account-profile-card"><div className="profile-avatar">{user.avatar && /^https?:\/\//.test(user.avatar)?<img src={user.avatar} alt=""/>:user.name.charAt(0).toUpperCase()}</div><div><span className="section-kicker">YOUR NOOKLY ACCOUNT</span><h1>{user.name}</h1><p>{user.email}</p></div></div><div className="profile-facts"><div><span>Account type</span><strong>{user.userMode === 'landlord'?'Landlord':user.tenantType==='student' || user.userMode==='student'?'Student tenant':user.tenantType || user.userMode}</strong></div>{user.schoolLocation&&<div><span>School location</span><strong>{user.schoolLocation}</strong></div>}{user.phone&&<div><span>Phone</span><strong>{user.phone}</strong></div>}</div><p className="profile-note">Profile editing and other account workflows will be brought over from the mobile app in a later phase.</p><button className="btn outline-btn" onClick={()=>void state.onLogout().catch(err=>window.alert(errorMessage(err)))}>Sign out</button></section>;
+  return <section className="container page-inner profile-page"><div className="account-profile-card"><div className="profile-avatar">{user.avatar && /^https?:\/\//.test(user.avatar)?<img src={user.avatar} alt=""/>:user.name.charAt(0).toUpperCase()}</div><div><span className="section-kicker">YOUR NOOKLY ACCOUNT</span><h1>{user.name}</h1><p>{user.email}</p></div></div><div className="profile-facts"><div><span>Account type</span><strong>{user.userMode === 'landlord'?'Landlord':user.tenantType==='student' || user.userMode==='student'?'Student tenant':user.tenantType || user.userMode}</strong></div>{user.schoolLocation&&<div><span>School location</span><strong>{user.schoolLocation}</strong></div>}{user.phone&&<div><span>Phone</span><strong>{user.phone}</strong></div>}</div><p className="profile-note">Manage your Nookly profile and accommodation activity.</p>{user.userMode!=='landlord'&&<Link className="btn outline-btn" to="/my-requests"><CalendarDays size={16}/> My rental requests</Link>}<button className="btn outline-btn" onClick={()=>void state.onLogout().catch(err=>window.alert(errorMessage(err)))}>Sign out</button></section>;
 }
 function Detail({ state }: { state: AppState }) {
   const { id } = useParams();
@@ -262,13 +266,11 @@ function Detail({ state }: { state: AppState }) {
     <div className="detail-head"><div><span className="section-kicker">{property.type || 'ACCOMMODATION'}</span><h1>{property.propertyName || 'Accommodation'}</h1><p><MapPin size={18}/>{property.address || 'Location unavailable'}</p></div><button className={`btn outline-btn ${saved?'saved-btn':''}`} onClick={()=>void state.toggleFavorite(property.$id)}><Heart size={18} fill={saved?'currentColor':'none'}/>{saved?'Saved':'Save this home'}</button></div>
     {cached && <div className="status-line"><WifiOff size={16}/> Viewing saved property details. Availability and prices may have changed.</div>}
     <div className="detail-gallery"><div className="gallery-primary">{photos[0] ? <img src={photos[0]} alt={property.propertyName || 'Property photo'}/> : <div className="photo-placeholder"><House size={54}/><span>Photo unavailable</span></div>}</div><div className="gallery-side">{photos.slice(1,3).map((src,i)=><img src={src} alt={`Property photo ${i+2}`} key={src}/>)}{photos.length<2 && <div className="photo-placeholder">More photos coming soon</div>}</div></div>
-    <div className="detail-layout"><section><div className="detail-block"><h2>About this place</h2><p className="long-copy">{property.description || 'No property description has been provided yet.'}</p></div><div className="detail-block"><h2>What this place offers</h2>{facilitiesOf(property).length ? <div className="amenity-grid">{facilitiesOf(property).map(f => <span key={f}><Check size={18}/>{f}</span>)}</div> : <p className="muted">Amenities have not been listed.</p>}</div><PropertyLocationPanel property={property}/></section>
+    {(['video1','video2','video3'] as const).some(key=>typeof property[key]==='string' && /^https?:\/\//.test(String(property[key])))&&<section className="nw-panel nw-video-tours"><h2>Video tours</h2><div className="nw-video-grid">{(['video1','video2','video3'] as const).map((key,i)=>typeof property[key]==='string'&&/^https?:\/\//.test(String(property[key]))?<video key={key} controls preload="metadata" playsInline src={String(property[key])} aria-label={`Property video tour ${i+1}`}/>:null)}</div></section>}
+    <div className="detail-layout"><section><div className="detail-block"><h2>About this place</h2><p className="long-copy">{property.description || 'No property description has been provided yet.'}</p></div><div className="detail-block"><h2>What this place offers</h2>{facilitiesOf(property).length ? <div className="amenity-grid">{facilitiesOf(property).map(f => <span key={f}><Check size={18}/>{f}</span>)}</div> : <p className="muted">Amenities have not been listed.</p>}</div><PropertyLocationPanel property={property}/><PropertyEngagement property={property} user={state.user} online={state.online}/></section>
       <aside className="booking-box"><span className="section-kicker">MONTHLY RENT</span><div className="booking-price">${money(priceOf(property))}<small> / month</small></div><div className="booking-sep"/>{Number(property.bedrooms)>0 && <div className="spec-row"><BedDouble size={19}/><span>Bedrooms</span><strong>{property.bedrooms}</strong></div>}{Number(property.roomFor)>0 && <div className="spec-row"><UserRound size={19}/><span>Room for</span><strong>{property.roomFor}</strong></div>}{Number(property.availableSlots)>=0 && property.availableSlots!==undefined && <div className="spec-row"><Check size={19}/><span>Available slots</span><strong>{property.availableSlots}</strong></div>}
         <div className="booking-sep"/>
-        {state.user ? <p className="booking-note">Accommodation requests, landlord messaging and reviews are being converted for the web. You are signed in, but those actions are not available yet.</p> : <>
-          <p className="booking-note">Browse and save this home freely. To send requests, message a landlord or post reviews when those features launch, you will need a Nookly account.</p>
-          <Link className="btn btn-wide" to={`/sign-in?returnTo=${encodeURIComponent(`/properties/${property.$id}`)}`}><KeyRound size={17}/> Sign in for property requests</Link>
-        </>}
+        <PropertyEnquiry property={property} user={state.user} online={state.online}/>
         <button className="btn outline-btn btn-wide" onClick={()=>void state.toggleFavorite(property.$id)}><Heart size={17} fill={saved?'currentColor':'none'}/>{saved?'Remove from saved':'Save property for later'}</button>
       </aside></div>
   </div>;
@@ -285,18 +287,7 @@ function Saved({ state }: { state: AppState }) {
 }
 
 function Landlord({state}:{state:AppState}) {
-  const [list,setList]=useState<Property[]>([]);const [loading,setLoading]=useState(true);const [err,setErr]=useState('');
-  useEffect(()=>{if (!state.user||state.user.userMode!=='landlord')return;let live=true;setLoading(true);setErr('');
-    const run=async()=>{if(!navigator.onLine){setList(state.properties.filter(p=>p.creatorId===state.user?.accountId));return;}
-      try{const result=await databases.listDocuments({databaseId:settings.databaseId,collectionId:settings.propertiesCollectionId,queries:[Query.equal('creatorId',state.user!.accountId),Query.orderDesc('$createdAt'),Query.limit(100)]});if(live)setList(result.documents as unknown as Property[]);}catch(e){if(live)setErr(errorMessage(e));}};
-    void run().finally(()=>{if(live)setLoading(false)});return()=>{live=false};
-  },[state.user,state.online,state.properties]);
-  if(!state.user) return <SignInRequired title="Landlord access" desc="Sign in with your landlord account to view and manage your accommodation listings." returnTo="/landlord" />;
-  if(state.user.userMode!=='landlord') return <div className="container page-inner"><Empty title="Landlord access only" desc="This page requires a Nookly landlord account." action={<Link className="btn" to="/account">View your account</Link>}/></div>;
-  return <div className="container page-inner"><span className="section-kicker">YOUR LANDLORD SPACE</span><div className="section-head"><div><h1>My properties</h1><p>Accommodation published from your existing Nookly landlord account.</p></div></div>
-    <div className="status-line">Property creation, editing and applicant requests will be migrated from the mobile app in the next phase. This screen is read-only.</div>
-    {loading?<p>Loading your listings…</p>:err?<Empty title="Couldn't load your listings" desc={err}/>:list.length?<div className="card-grid">{list.map(p=><PropertyCard property={p} state={state} key={p.$id}/>)}</div>:<Empty title="No properties found" desc="Your landlord listings will appear here once your Appwrite records are available."/>}
-  </div>;
+  return <LandlordWorkspace user={state.user} online={state.online} refresh={state.refresh}/>;
 }
 
 function AppContent(){
@@ -331,7 +322,7 @@ function AppContent(){
   const state:AppState={user,userOffline,online,accountId,properties,loading,loadError,fromCache,cachedAt,favorites,pendingFavorites,guestFavorites,importGuestFavorites:importSavedGuestFavorites,refresh:()=>refresh(true),toggleFavorite,onLogin:setUser,onLogout};
   if(!sessionReady)return <div className="startup"><Brand/><div className="pulse"/><p>Preparing your Nookly home...</p></div>;
   return <Shell state={state}>{missingCoreSettings().length>0&&<div className="container config-warning"><strong>Appwrite setup needed:</strong> {missingCoreSettings().join(', ')}. Add these values to <code>.env</code> and restart the dev server.</div>}{sessionError&&<div className="container config-warning">Session check: {sessionError}</div>}
-    <Routes><Route path="/" element={<Explore state={state} mode="home"/>} /><Route path="/explore" element={<Explore state={state} mode="explore"/>} /><Route path="/map" element={<MapBrowsePage properties={state.properties} loading={state.loading}/>} /><Route path="/saved" element={<Saved state={state}/>} /><Route path="/account" element={<Account state={state}/>} /><Route path="/properties/:id" element={<Detail state={state}/>} /><Route path="/sign-in" element={<SignInPage user={state.user} online={state.online} onLogin={state.onLogin}/>} /><Route path="/sign-up" element={<SignUpPage user={state.user} online={state.online} onLogin={state.onLogin}/>} /><Route path="/match" element={<RoommateMatch user={state.user} online={state.online}/>} /><Route path="/landlord" element={<Landlord state={state}/>} /><Route path="*" element={<div className="container page-inner"><Empty title="Page not found" desc="This page isn't available in Nookly Accommodation Web." action={<Link className="btn" to="/">Return home</Link>}/></div>}/></Routes>
+    <Routes><Route path="/" element={<Explore state={state} mode="home"/>} /><Route path="/explore" element={<Explore state={state} mode="explore"/>} /><Route path="/map" element={<MapBrowsePage properties={state.properties} loading={state.loading}/>} /><Route path="/saved" element={<Saved state={state}/>} /><Route path="/my-requests" element={<MyRequests user={state.user} online={state.online}/>} /><Route path="/account" element={<Account state={state}/>} /><Route path="/properties/:id" element={<Detail state={state}/>} /><Route path="/sign-in" element={<SignInPage user={state.user} online={state.online} onLogin={state.onLogin}/>} /><Route path="/sign-up" element={<SignUpPage user={state.user} online={state.online} onLogin={state.onLogin}/>} /><Route path="/match" element={<RoommateMatch user={state.user} online={state.online}/>} /><Route path="/landlord" element={<Landlord state={state}/>} /><Route path="*" element={<div className="container page-inner"><Empty title="Page not found" desc="This page isn't available in Nookly Accommodation Web." action={<Link className="btn" to="/">Return home</Link>}/></div>}/></Routes>
   </Shell>;
 }
 

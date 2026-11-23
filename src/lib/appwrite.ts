@@ -12,6 +12,8 @@ export const settings = {
   organizationTenantsCollectionId: import.meta.env.VITE_APPWRITE_ORGANIZATION_TENANTS_COLLECTION_ID?.trim() || '',
   organizationsCollectionId: import.meta.env.VITE_APPWRITE_ORGANIZATIONS_COLLECTION_ID?.trim() || '',
   matchProfilesCollectionId: import.meta.env.VITE_APPWRITE_MATCH_PROFILES_COLLECTION_ID?.trim() || '',
+  likesCollectionId: import.meta.env.VITE_APPWRITE_LIKES_COLLECTION_ID?.trim() || '',
+  requestsCollectionId: import.meta.env.VITE_APPWRITE_REQUESTS_COLLECTION_ID?.trim() || '',
   bucketId: import.meta.env.VITE_APPWRITE_BUCKET_ID?.trim() || '',
 };
 
